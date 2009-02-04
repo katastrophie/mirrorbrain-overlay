@@ -1,0 +1,26 @@
+# ChangeLog for www-misc/mirrorbrain
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*mirrorbrain-2.11.3 (17 Dec 2009)
+
+  17 Dec 2009; Lance Albertson <ramereth@gentoo.org>
+  +mirrorbrain-2.11.3.ebuild, +metadata.xml:
+  Version bump, fix docs & deps
+
+*mirrorbrain-9999 (20 May 2009)
+
+  20 May 2009; Lance Albertson <ramereth@gentoo.org>
+  +mirrorbrain-9999.ebuild:
+  New subversion ebuild
+
+  20 May 2009; Lance Albertson <ramereth@gentoo.org> mirrorbrain-2.8.ebuild:
+  Several fixes
+
+  * Made versions stricter for mirrorbrain
+
+  * All tools, sql are now in /usr/share
+
+  15 May 2009; Lance Albertson <ramereth@gentoo.org> ChangeLog:
+  New ebuild
+
