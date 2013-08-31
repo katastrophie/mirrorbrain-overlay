@@ -39,7 +39,7 @@ S="${WORKDIR}/${MY_P}"
 
 pkg_setup() {
 	enewgroup mirrorbrain
-	enewuser mirrorbrain -1 -1 /dev/null mirrorbrain
+	enewuser mirrorbrain -1 -1 /home/mirrorbrain mirrorbrain
 }
 
 src_compile() {
