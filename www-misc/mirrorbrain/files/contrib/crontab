@@ -1,0 +1,6 @@
+# update ASN data in all MB instances
+35 2  * * *   mirrorbrain   sleep $(($RANDOM/16)); asn_get_routeviews | asn_import
+*  *  * * *   mirrorbrain   /usr/bin/mirrorprobe
+45 *  * * *   mirrorbrain   /usr/bin/mb scan --quiet --jobs 4 --all
+30 1  * * mon mirrorbrain   /usr/bin/mb db vacuum
+31 2  * * mon root          sleep $(($RANDOM/1024)); /usr/bin/geoip-lite-update

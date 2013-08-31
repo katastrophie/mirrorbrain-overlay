@@ -1,0 +1,18 @@
+--- mirrorbrain-2.17.0.org/mb/mb/conn.py	2012-04-01 01:49:09.000000000 +0200
++++ mirrorbrain-2.17.0/mb/mb/conn.py	2013-08-30 22:35:35.000000000 +0200
+@@ -20,7 +20,6 @@ regionOnly     : %(regionOnly)s
+ countryOnly    : %(countryOnly)s
+ asOnly         : %(asOnly)s
+ prefixOnly     : %(prefixOnly)s
+-ipv6Only       : %(ipv6Only)s
+ otherCountries : %(otherCountries)s
+ fileMaxsize    : %(fileMaxsize)s
+ publicNotes    : %(publicNotes)s
+@@ -74,7 +73,6 @@ def server2dict(s):
+                 countryOnly   = s.countryOnly,
+                 asOnly        = s.asOnly,
+                 prefixOnly    = s.prefixOnly,
+-                ipv6Only      = s.ipv6Only,
+                 otherCountries = s.otherCountries,
+                 fileMaxsize   = s.fileMaxsize,
+                 score         = s.score,
