@@ -1,0 +1,183 @@
+commit ea02693ac1bb0b1636938a031c561bdbaf11a41e
+Author: Mario Manno <mail@manno.name>
+Date:   Thu Sep 5 20:30:43 2013 +0200
+
+    use configured hostname instead of request hostname (=internal ip)
+
+diff --git a/mod_mirrorbrain/mod_mirrorbrain.c b/mod_mirrorbrain/mod_mirrorbrain.c
+index b1ab14f..b7783ef 100644
+--- a/mod_mirrorbrain/mod_mirrorbrain.c
++++ b/mod_mirrorbrain/mod_mirrorbrain.c
+@@ -2571,7 +2571,7 @@ static int mb_handler(request_rec *r)
+ 
+             /* a HTTP link to the file */
+             APR_ARRAY_PUSH(m, char *) = 
+-                apr_psprintf(r->pool, "&amp;as=http://%s%s", ap_escape_uri(r->pool, r->hostname), 
++                apr_psprintf(r->pool, "&amp;as=http://%s%s", ap_escape_uri(r->pool, r->server->server_hostname), 
+                                                              ap_escape_uri(r->pool, r->uri));
+ 
+             if (!apr_is_empty_array(scfg->tracker_urls)) {
+@@ -2636,7 +2636,7 @@ static int mb_handler(request_rec *r)
+              *
+              * We use r->uri, not r->unparsed_uri, so we don't need to escape query strings for xml.
+              */
+-            ap_rprintf(r, "  <origin dynamic=\"true\">http://%s%s.%s</origin>\n", r->hostname, r->uri, rep_ext);
++            ap_rprintf(r, "  <origin dynamic=\"true\">http://%s%s.%s</origin>\n", r->server->server_hostname, r->uri, rep_ext);
+             ap_rprintf(r, "  <published>%s</published>\n", time_str);
+ 
+             if (scfg->metalink_publisher_name && scfg->metalink_publisher_url) {
+@@ -2656,7 +2656,7 @@ static int mb_handler(request_rec *r)
+             time_str = apr_palloc(r->pool, APR_RFC822_DATE_LEN);
+             apr_rfc822_date(time_str, apr_time_now());
+ 
+-            ap_rprintf(r, "  origin=\"http://%s%s.%s\"\n", r->hostname, r->uri, rep_ext);
++            ap_rprintf(r, "  origin=\"http://%s%s.%s\"\n", r->server->server_hostname, r->uri, rep_ext);
+             ap_rputs(     "  generator=\"MirrorBrain "MOD_MIRRORBRAIN_VER" (see http://mirrorbrain.org/)\"\n", r);
+             ap_rputs(     "  type=\"dynamic\"", r);
+             ap_rprintf(r, "  pubdate=\"%s\"", time_str);
+@@ -2802,7 +2802,7 @@ static int mb_handler(request_rec *r)
+             debugLog(r, cfg, "found torrent file");
+             ap_rprintf(r, "    <url type=\"bittorrent\" preference=\"%d\">http://%s%s.torrent</url>\n\n", 
+                        100,
+-                       r->hostname, 
++                       r->server->server_hostname, 
+                        r->uri);
+         }
+ 
+@@ -3000,7 +3000,7 @@ static int mb_handler(request_rec *r)
+         ap_rputs("<div id=\"mirrorbrain-details\">\n", r);
+         ap_rprintf(r, "  <h2>Mirrors for <a href=\"http://%s%s\">http://%s%s</a></h2>\n" 
+                    "  <br/>\n", 
+-                   r->hostname, r->uri, r->hostname, r->uri);
++                   r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+ 
+         ap_rputs("  <address>Powered by <a href=\"http://mirrorbrain.org/\">MirrorBrain</a></address>\n", r);
+ 
+@@ -3017,22 +3017,22 @@ static int mb_handler(request_rec *r)
+         if (hashbag != NULL) {
+             if (hashbag->sha256hex)
+                 ap_rprintf(r, "  <li><a href=\"http://%s%s.sha256\">SHA-256 Hash</a>: <tt>%s</tt> "
+-                              "</li>\n", r->hostname, r->uri, hashbag->sha256hex);
++                              "</li>\n", r->server->server_hostname, r->uri, hashbag->sha256hex);
+             if (hashbag->sha1hex)
+                 ap_rprintf(r, "  <li><a href=\"http://%s%s.sha1\">SHA-1 Hash</a>: <tt>%s</tt> "
+-                              "</li>\n", r->hostname, r->uri, hashbag->sha1hex);
++                              "</li>\n", r->server->server_hostname, r->uri, hashbag->sha1hex);
+             if (hashbag->md5hex)
+                 ap_rprintf(r, "  <li><a href=\"http://%s%s.md5\">MD5 Hash</a>: <tt>%s</tt> "
+-                              "</li>\n", r->hostname, r->uri, hashbag->md5hex);
++                              "</li>\n", r->server->server_hostname, r->uri, hashbag->md5hex);
+             if (hashbag->btihhex)
+                 ap_rprintf(r, "  <li><a href=\"http://%s%s.btih\">BitTorrent Information Hash</a>: <tt>%s</tt> "
+-                              "</li>\n", r->hostname, r->uri, hashbag->btihhex);
++                              "</li>\n", r->server->server_hostname, r->uri, hashbag->btihhex);
+ 
+             if (hashbag->pgp) {
+                 /* contrary to the hashes, we don't have a handler for .asc files, because
+                  * the database always only gets a signature when one already exists on-disk */
+                 ap_rprintf(r, "  <li>PGP signature <a href=\"http://%s%s.asc\">available</a> "
+-                              "</li>\n", r->hostname, r->uri);
++                              "</li>\n", r->server->server_hostname, r->uri);
+             }
+         }
+         ap_rputs("  </ul>\n", r);
+@@ -3044,21 +3044,21 @@ static int mb_handler(request_rec *r)
+                  "  <br/>\n", r);
+         ap_rprintf(r, "  <a href=\"http://%s%s.meta4\">http://%s%s.meta4</a> (IETF Metalink)"
+                       "  <br/>\n", 
+-                r->hostname, r->uri, r->hostname, r->uri);
++                r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+         ap_rprintf(r, "  <a href=\"http://%s%s.metalink\">http://%s%s.metalink</a> (old (v3) Metalink)"
+                       "  <br/>\n", 
+-                r->hostname, r->uri, r->hostname, r->uri);
++                r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+         if (hashbag) {
+             ap_rprintf(r, "  P2P Links:\n<br/>"
+                           "  <a href=\"http://%s%s.torrent\">http://%s%s.torrent</a> (BitTorrent)\n", 
+-                          r->hostname, r->uri, r->hostname, r->uri);
++                          r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+             ap_rprintf(r, "  <br/><a href=\"http://%s%s.magnet\">http://%s%s.magnet</a> (Magnet)\n", 
+-                          r->hostname, r->uri, r->hostname, r->uri);
++                          r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+             if (hashbag->sha1hex && (hashbag->zblocksize > 0) 
+                     && hashbag->zhashlens && hashbag->zsumshex) {
+                 ap_rprintf(r, "  <br/>zsync Link:\n<br/>"
+                               "  <a href=\"http://%s%s.zsync\">http://%s%s.zsync</a>\n", 
+-                              r->hostname, r->uri, r->hostname, r->uri);
++                              r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+             }
+         }
+         ap_rputs("  </blockquote>\n\n", r);
+@@ -3106,7 +3106,7 @@ static int mb_handler(request_rec *r)
+                                   && !mirrors_elsewhere->nelts)) {
+             ap_rprintf(r, "  <p>I am very sorry, but no mirror was found. Feel free to download directly:<br/>\n");
+             ap_rprintf(r, "  <a href=\"http://%s%s\">http://%s%s</a> </p>\n",
+-                       r->hostname, r->uri, r->hostname, r->uri);
++                       r->server->server_hostname, r->uri, r->server->server_hostname, r->uri);
+             ap_rputs("</body></html>\n", r);
+             return OK;
+         }
+@@ -3379,8 +3379,8 @@ static int mb_handler(request_rec *r)
+             /* add the redirector, in case there wasn't any mirror */
+             if (!found_urls) {
+                 APR_ARRAY_PUSH(m, char *) = 
+-                    apr_psprintf(r->pool, "%d:http://%s%s", (7 + strlen(r->hostname) + strlen(r->uri)), 
+-                                                            r->hostname, r->uri);
++                    apr_psprintf(r->pool, "%d:http://%s%s", (7 + strlen(r->server->server_hostname) + strlen(r->uri)), 
++                                                            r->server->server_hostname, r->uri);
+             }
+ 
+ #if 0
+@@ -3388,8 +3388,8 @@ static int mb_handler(request_rec *r)
+              * retrieves a Metalink then and doesn't expect it in that situation. Maybe later */
+             APR_ARRAY_PUSH(m, char *) = 
+                 apr_psprintf(r->pool,     "8:url-list"
+-                                          "%d:http://%s%s", (7 + strlen(r->hostname) + strlen(r->uri)), 
+-                                                            r->hostname, r->uri);
++                                          "%d:http://%s%s", (7 + strlen(r->server->server_hostname) + strlen(r->uri)), 
++                                                            r->server->server_hostname, r->uri);
+ #endif
+ 
+             if (!apr_is_empty_array(m)) {
+@@ -3476,7 +3476,7 @@ static int mb_handler(request_rec *r)
+         }
+         /* add the redirector, in case there wasn't any mirror */
+         if (!found_urls) {
+-            ap_rprintf(r, "URL: http://%s%s\n", r->hostname, r->uri);
++            ap_rprintf(r, "URL: http://%s%s\n", r->server->server_hostname, r->uri);
+         }
+ 
+ 
+@@ -3513,7 +3513,7 @@ static int mb_handler(request_rec *r)
+                 ap_rprintf(r, "%s%s/\n", mirror->baseurl, yum->dir);
+             }
+         } else {
+-            ap_rprintf(r, "http://%s/%s/\n", r->hostname, yum->dir);
++            ap_rprintf(r, "http://%s/%s/\n", r->server->server_hostname, yum->dir);
+         }
+         setenv_give(r, "yumlist");
+         return OK;
+@@ -3591,20 +3591,20 @@ static int mb_handler(request_rec *r)
+     /* rel=describedby */
+     apr_table_addn(r->err_headers_out, "Link", 
+                    apr_pstrcat(r->pool,
+-                               "<http://", r->hostname, r->uri, ".meta4>; "
++                               "<http://", r->server->server_hostname, r->uri, ".meta4>; "
+                                "rel=describedby; type=\"application/metalink4+xml\"", 
+                                NULL));
+     if (hashbag && hashbag->pgp) {
+         apr_table_addn(r->err_headers_out, "Link", 
+                        apr_pstrcat(r->pool,
+-                                   "<http://", r->hostname, r->uri, ".asc>; "
++                                   "<http://", r->server->server_hostname, r->uri, ".asc>; "
+                                    "rel=describedby; type=\"application/pgp-signature\"", 
+                                    NULL));
+     }
+     if (!apr_is_empty_array(scfg->tracker_urls) && hashbag && hashbag->btihhex) {
+         apr_table_addn(r->err_headers_out, "Link", 
+                        apr_pstrcat(r->pool,
+-                                   "<http://", r->hostname, r->uri, ".torrent>; "
++                                   "<http://", r->server->server_hostname, r->uri, ".torrent>; "
+                                    "rel=describedby; type=\"application/x-bittorrent\"", 
+                                    NULL));
+     }

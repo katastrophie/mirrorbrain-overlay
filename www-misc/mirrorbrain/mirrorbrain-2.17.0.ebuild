@@ -57,10 +57,6 @@ src_install() {
 	docinto installation
 	dodoc docs/installation/*.rst
 	
-	# FIXME remove ipv6Only from /usr/lib64/python2.7/site-packages/mb/conn.py
-	# FIXME add example crontab
-	# FIXME add example apache vhos config
-
 	# install misc files/scripts
 	newbin tools/geoiplookup_continent geoiplookup_continent
 	newbin tools/geoiplookup_city geoiplookup_city
@@ -72,10 +68,15 @@ src_install() {
 	doins -r sql
 	doins -r tools
 	rm "${D}"/usr/share/"${PN}"/tools/*.c
+	rm "${D}"/usr/share/"${PN}"/tools/*.patch
+
 	# install mirrordoctor
 	cd mb
 	distutils_src_install
 	doins -r famfamfam_flag_icons
+	# remove ipv6Only from /usr/lib64/python2.7/site-packages/mb/conn.py
+	# it's missing from default database
+	epatch "${FILESDIR}"/mirrorbrain-no_ipv6_only.patch
 	newbin mb.py mb
 
 	# config files

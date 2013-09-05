@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit apache-module
+inherit apache-module eutils
 
 MY_PN="mirrorbrain"
 MY_P="${MY_PN}-${PV}"
@@ -31,6 +31,10 @@ S="${WORKDIR}/${MY_P}/${PN}"
 # See apache-module.eclass for more information.
 APACHE2_MOD_CONF="70_${PN}"
 APACHE2_MOD_DEFINE="MIRRORBRAIN"
+
+src_unpack () {
+	patch -p2 < "${FILESDIR}"/mirrorbrain-hostname.patch
+}
 
 if use memcache ; then
 	APXS2_ARGS="-DWITH_MEMCACHE -c ${PN}.c"
