@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <layman>
   <overlay name="mirrorbrain-overlay" status="official" type="git"
-      src="git@github.com:katastrophie/mirrorbrain-overlay.git"
+      src="git@github.com:manno/mirrorbrain-overlay.git"
     contact="media@koeln.ccc.de">
-    <link>https://github.com/katastrophie/mirrorbrain-overlay</link>
+    <link>https://github.com/manno/mirrorbrain-overlay</link>
     <description>mirrorbrain gentoo overlay forked from Ramereth</description>
   </overlay>
 </layman>
