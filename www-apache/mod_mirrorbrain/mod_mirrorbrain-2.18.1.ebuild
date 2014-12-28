@@ -34,6 +34,7 @@ APACHE2_MOD_DEFINE="MIRRORBRAIN"
 
 src_prepare () {
 	patch -p2 < "${FILESDIR}"/mirrorbrain-hostname-${PV}.patch
+	patch -p2 < "${FILESDIR}"/mirrorbrain-multitracker-seperate-tier-${PV}.patch
 }
 
 if use memcache ; then

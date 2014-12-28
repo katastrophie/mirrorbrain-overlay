@@ -1,0 +1,21 @@
+diff --git a/mod_mirrorbrain/mod_mirrorbrain.c b/mod_mirrorbrain/mod_mirrorbrain.c
+index 13b2709..0c09eb7 100644
+--- a/mod_mirrorbrain/mod_mirrorbrain.c
++++ b/mod_mirrorbrain/mod_mirrorbrain.c
+@@ -3234,13 +3234,12 @@ static int mb_handler(request_rec *r)
+                           "8:announce"
+                               "%" APR_SIZE_T_FMT ":%s", strlen(tracker), tracker);
+ 
+-        ap_rputs(         "13:announce-listll", r);
++        ap_rputs(         "13:announce-listl", r);
+         for (i = 0; i < scfg->tracker_urls->nelts; i++) {
+             tracker = ((char **) scfg->tracker_urls->elts)[i];
+-            ap_rprintf(r,     "%" APR_SIZE_T_FMT ":%s", strlen(tracker), tracker);
++            ap_rprintf(r,     "l%" APR_SIZE_T_FMT ":%se", strlen(tracker), tracker);
+         }
+-        ap_rputs(             "e"
+-                          "e", r);
++        ap_rputs(         "e", r);
+ 
+         ap_rprintf(r,     "7:comment"
+                               "%" APR_SIZE_T_FMT ":%s", strlen(basename), basename);
